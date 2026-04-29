@@ -1,4 +1,3 @@
-
 import java.util.*;
 
 public class Cafeteria {
@@ -43,24 +42,53 @@ public class Cafeteria {
                     servePerson();
                     break;
 
+                case "LEAVE":
+                    if(parts.length > 1) leavePerson(parts[1]);
+                    break;
+
+                case "PEEK":
+                    peekLine();
+                    break;
+
+                case "SIZE":
+                    printSize();
+                    break;
+
+                case "TICK":
+                    if(parts.length > 1) {
+                        try {
+                            int mins = Integer.parseInt(parts[1]);
+                            tickTime(mins);
+                        } catch (NumberFormatException e) {
+                            System.out.println("Ошибка: введите целое число минут");
+                        }
+                    }
+                    break;
+
+                case "STATS":
+                    printStats();
+                    break;
+
                 case "PRINT":
                     System.out.println(queue);
                     break;
 
                 case "EXIT":
                     return;
+
+                default:
+                    System.out.println("Неизвестная команда. Введите HELP.");
             }
         }
     }
 
     static void showHelp(){
-        System.out.println("Commands: ARRIVE, VIP_ARRIVE, SERVE, PRINT, EXIT");
+        System.out.println("Commands: ARRIVE, VIP_ARRIVE, SERVE, LEAVE, PEEK, SIZE, TICK, STATS, PRINT, EXIT");
     }
 
     static void addPerson(String name, boolean vip){
-
         if(arriveTime.containsKey(name)){
-            System.out.println("Already in line");
+            System.out.println("Name already in system");
             return;
         }
 
@@ -74,9 +102,8 @@ public class Cafeteria {
     }
 
     static void servePerson(){
-
         if(queue.isEmpty()){
-            System.out.println("No one in line");
+            System.out.println("No one to serve.");
             return;
         }
 
@@ -88,6 +115,45 @@ public class Cafeteria {
         served++;
         totalWait += wait;
 
-        System.out.println("Served " + p + " waited " + wait);
+        System.out.println("Served " + p + " (waited " + wait + " min).");
+    }
+
+    static void leavePerson(String name) {
+        if (queue.remove(name)) {
+            arriveTime.remove(name);
+            System.out.println(name + " left the line.");
+        } else {
+            System.out.println("Not found");
+        }
+    }
+
+    static void peekLine() {
+        if (queue.isEmpty()) {
+            System.out.println("Line is empty.");
+        } else {
+            System.out.println("Next: " + queue.peekFirst());
+        }
+    }
+
+    static void printSize() {
+        System.out.println("Size: " + queue.size());
+    }
+
+    static void tickTime(int mins) {
+        if (mins < 0) {
+            System.out.println("Error: minutes cannot be negative.");
+            return;
+        }
+        time += mins;
+        System.out.println("Time advanced by " + mins + " minutes. Current time = " + time);
+    }
+
+    static void printStats() {
+        if (served == 0) {
+            System.out.println("Served count = 0, Avg wait = 0.00 min.");
+        } else {
+            double avgWait = (double) totalWait / served;
+            System.out.printf("Served count = %d, Avg wait = %.2f min.\n", served, avgWait);
+        }
     }
 }
